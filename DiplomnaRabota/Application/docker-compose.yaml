@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:latest
+    container_name: postgres_database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: interview_prep_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Backend service
+  backend:
+    build:
+      context: ./backend
+    container_name: backend_app
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: interview_prep_db
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend_app
+    ports:
+      - "3001:3001" 
+    environment:
+      REACT_APP_BACKEND_URL: http://backend:5000  # backend service name instead of localhost
+      PORT: 3001  # Set the internal port to 3001
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
