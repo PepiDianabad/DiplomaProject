@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: ppetrov06/interview_preparation_app:backend
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_HOST
+          value: "postgres" 
+        - name: DATABASE_USER
+          value: "postgres"      
+        - name: DATABASE_PASSWORD
+          value: "password"      
+        - name: DATABASE_NAME
+          value: "interview_prep_db"      
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: backend
+  type: ClusterIP
