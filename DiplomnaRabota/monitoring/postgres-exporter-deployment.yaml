@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+  namespace: monitoring  # Change this to 'monitoring'
+  labels:
+    app: postgres-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: prometheuscommunity/postgres-exporter
+        env:
+          - name: DATA_SOURCE_NAME
+            value: "postgresql://postgres:password@postgres:5432/interview_prep_db?sslmode=disable"
+        ports:
+          - containerPort: 9187  # The port where metrics will be exposed

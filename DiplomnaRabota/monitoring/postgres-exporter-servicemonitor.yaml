@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgres-exporter
+  namespace: monitoring  # Ensure the namespace is correct
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: postgres-exporter  # This label should match with the label of your postgres-exporter service
+  namespaceSelector:
+    matchNames:
+      - default  # The namespace of the postgres-exporter service
+  endpoints:
+    - port: metrics  # Match the port name here with the one defined in the service (e.g., 'metrics')
+      path: /metrics
+      interval: 45s  # Define the scrape interval here, **NOT** in the Service
