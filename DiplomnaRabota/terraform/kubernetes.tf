@@ -9,12 +9,12 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
 }
 
-# Namespace
-resource "kubernetes_namespace" "app" {
-  metadata {
-    name = "application"
-  }
-}
+ # Namespace
+ resource "kubernetes_namespace" "app" {
+   metadata {
+     name = "application"
+   }
+ }
 
 # Backend Deployment
 resource "kubernetes_deployment" "backend" {
@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "backend" {
       }
       spec {
         container {
-          image = "ppetrov06/interview_preparation_app:backend"
+          image = "ppetrov06/interview_preparation_app:backend3"
           name  = "backend"
           port {
             container_port = 5000
@@ -83,7 +83,7 @@ resource "kubernetes_service" "backend" {
       port        = 5000
       target_port = 5000
     }
-    type = "ClusterIP"
+    type = "LoadBalancer"
   }
 }
 
@@ -108,7 +108,7 @@ resource "kubernetes_deployment" "frontend" {
       }
       spec {
         container {
-          image = "ppetrov06/interview_preparation_app:frontend"
+          image = "ppetrov06/interview_preparation_app:frontend6"
           name  = "frontend"
           port {
             container_port = 3001
