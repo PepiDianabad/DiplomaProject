@@ -15,7 +15,7 @@ const SignUp = ({ setUser }) => {
 
     if (username && password) {
       try {
-        const response = await axios.post('http://localhost:5000/auth/signup', {
+        const response = await axios.post('http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/auth/signup', {
           username,
           password,
         });

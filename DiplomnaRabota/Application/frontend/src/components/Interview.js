@@ -76,7 +76,7 @@ const Interview = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5000/interviews/aiquestions', interviewData);
+      const response = await axios.post('http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/interviews/aiquestions', interviewData);
       setQuestions(response.data.questions); // assuming questions are returned as an array
       setShowNextQuestionButton(true);
       setCurrentQuestion(0);
@@ -105,14 +105,14 @@ const Interview = () => {
     try {
       console.log('Sending feedback data:', feedbackData);
       
-      const feedbackResponse = await axios.post('http://localhost:5000/interviews/aifeedback', feedbackData);
+      const feedbackResponse = await axios.post('http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/interviews/aifeedback', feedbackData);
       
       console.log("Received feedback response:", feedbackResponse.data.feedback);
 
       interviewData.feedback = feedbackResponse.data.feedback;
   
-      await axios.post('http://localhost:5000/interviews', interviewData);
-      console.log("Interview data submitted");
+      await axios.post('http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/interviews', interviewData);
+      console.log("Interview data submittedd");
   
       navigate('/results', { state: { results: feedbackResponse.data, userId: interviewData.userId } });
     } catch (error) {

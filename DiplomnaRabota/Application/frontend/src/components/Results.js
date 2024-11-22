@@ -13,7 +13,7 @@ const Results = () => {
   useEffect(() => {
     const fetchInterviews = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/results/${userId}`);
+        const response = await axios.get(`http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/results/${userId}`);
         console.log(response.data);
         setInterviews(response.data);
       } catch (err) {

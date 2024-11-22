@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "backend" {
       }
       spec {
         container {
-          image = "ppetrov06/interview_preparation_app:backend3"
+          image = "ppetrov06/interview_preparation_app:backend10"
           name  = "backend"
           port {
             container_port = 5000
@@ -108,7 +108,7 @@ resource "kubernetes_deployment" "frontend" {
       }
       spec {
         container {
-          image = "ppetrov06/interview_preparation_app:frontend6"
+          image = "ppetrov06/interview_preparation_app:frontend199"
           name  = "frontend"
           port {
             container_port = 3001

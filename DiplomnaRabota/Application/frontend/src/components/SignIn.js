@@ -16,7 +16,7 @@ const SignIn = ({ setUser }) => {
     if (username && password) {
       try {
         console.log(username, password);
-        const response = await axios.post('http://ab7b03b63143d403cbd93c8e5d35c4d3-1864689775.eu-central-1.elb.amazonaws.com:5000/auth/login', {
+        const response = await axios.post('http://a7314a4ee04f744208c1e93d79a7412e-850590677.eu-central-1.elb.amazonaws.com:5000/auth/login', {
           username,
           password,
         });

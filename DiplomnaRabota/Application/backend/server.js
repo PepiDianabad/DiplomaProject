@@ -18,7 +18,7 @@ app.use(express.json()); // Parse JSON bodies
 
 // Use CORS to allow requests from your React app
 app.use(cors({
-  origin: 'http://a96e3f3be3757486583750bf450c5d75-357478491.eu-central-1.elb.amazonaws.com:3001', // React app URL
+  origin: 'http://a1627368ee5474211ab70d00f923574e-621459643.eu-central-1.elb.amazonaws.com:3001', // React app URL
   credentials: true // If you want to allow cookies, authentication headers, etc.
 }));
 
