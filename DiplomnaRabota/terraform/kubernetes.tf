@@ -2,6 +2,11 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
 
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
 
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint

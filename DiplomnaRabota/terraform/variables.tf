@@ -19,19 +19,19 @@ variable "cluster_version" {
 variable "desired_capacity" {
   description = "Desired number of worker nodes"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "min_capacity" {
   description = "Minimum number of worker nodes"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "max_capacity" {
   description = "Maximum number of worker nodes"
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "node_group_instance_type" {
@@ -66,6 +66,23 @@ variable "private_subnets" {
   description = "Private subnets CIDR blocks"
   default     = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 }
+
+# variable "cluster_endpoint" {
+#   description = "EKS Cluster endpoint for Kubernetes provider"
+#   type        = string
+# }
+
+# variable "kubeconfig_token" {
+#   description = "Authentication token for Kubernetes"
+#   type        = string
+# }
+
+# variable "cluster_ca_certificate" {
+#   description = "CA Certificate for Kubernetes cluster"
+#   type        = string
+# }
+
+
 
 
 
