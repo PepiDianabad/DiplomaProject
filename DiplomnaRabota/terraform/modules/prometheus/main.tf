@@ -12,19 +12,23 @@ resource "helm_release" "prometheus" {
   namespace  = "monitoring"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "45.7.1"  # Replace with a valid version you found
+  version    = "66.3.0"  # Replace with a valid version you found
 
   values = [
     <<EOF
     prometheus:
       prometheusSpec:
         serviceMonitorSelectorNilUsesHelmValues: false
+        additionalScrapeConfigs:
+          - job_name: 'postgres'
+            static_configs:
+              - targets: ['postgres-exporter.application:9187']
     EOF
   ]
 
-depends_on = [
-  data.aws_eks_cluster.example  # Use data source instead of resource
-]
-}
+  timeout = 600  # Set timeout in seconds (10 minutes = 600 seconds)
 
-# You can add more resources like ServiceAccounts, ConfigMaps if needed for the Prometheus setup
+  depends_on = [
+    data.aws_eks_cluster.example  # Use data source instead of resource
+  ]
+}
