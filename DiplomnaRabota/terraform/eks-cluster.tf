@@ -88,9 +88,9 @@
 
     eks_managed_node_groups = {
       app_nodes = {
-        desired_capacity = 3#var.desired_capacity
+        desired_capacity = 2#var.desired_capacity
         max_capacity     = 3#var.max_capacity
-        min_capacity     = 5#var.min_capacity
+        min_capacity     = 2#var.min_capacity
         instance_type    = var.node_group_instance_type
         key_name         = var.key_name
       }
