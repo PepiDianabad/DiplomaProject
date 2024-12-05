@@ -12,7 +12,7 @@ resource "helm_release" "prometheus" {
   namespace  = "monitoring"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "66.3.0"  # Replace with a valid version you found
+  version    = "66.3.0"  
 
   values = [
     <<EOF
@@ -23,12 +23,15 @@ resource "helm_release" "prometheus" {
           - job_name: 'postgres'
             static_configs:
               - targets: ['postgres-exporter.application:9187']
+          - job_name: 'node-exporter'
+            static_configs:
+              - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
     EOF
   ]
 
-  timeout = 600  # Set timeout in seconds (10 minutes = 600 seconds)
+  timeout = 600  # timeout in seconds (10 minutes = 600 seconds)
 
   depends_on = [
-    data.aws_eks_cluster.example  # Use data source instead of resource
+    data.aws_eks_cluster.example  # data source instead of resource
   ]
 }

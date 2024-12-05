@@ -109,15 +109,15 @@
   }
 
   module "prometheus" {
-    source = "./modules/prometheus"  # Path to your Prometheus module
+    source = "./modules/prometheus"  # Path to Prometheus module
     eks_role_arn = data.aws_eks_cluster.example.arn
-    subnet_ids   = data.aws_subnets.example.ids  # Pass the list of subnet IDs here
+    subnet_ids   = data.aws_subnets.example.ids 
     vpc_id       = data.aws_vpc.example.id
   }
 
   # Declare the VPC data source
   data "aws_vpc" "example" {
-    id = "vpc-0076a3641ca670234"  # Replace with your VPC ID or use a filter to find it dynamically
+    id = "vpc-0076a3641ca670234"  
   }
 
   # Declare the Subnet data source
@@ -143,3 +143,9 @@
     description = "IAM Role ARN for EBS CSI Driver"
     value       = module.irsa-ebs-csi.iam_role_arn
   }
+
+  #sage makaker module - definition
+  module "sagemaker" {
+  source = "./sagemaker"
+}
+

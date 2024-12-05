@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "backend" {
           }
           env {
             name  = "DB_HOST"
-            value = "postgres"  # This should match the PostgreSQL service name
+            value = "postgres"  # postgresql service name
           }
           env {
             name  = "DB_PORT"
@@ -120,7 +120,7 @@ resource "kubernetes_deployment" "frontend" {
           }
           env {
             name  = "HOST"
-            value = "0.0.0.0"  # Add this line to listen on all interfaces
+            value = "0.0.0.0"  # listen on all interfaces
           }
         }
       }
@@ -182,7 +182,7 @@ resource "kubernetes_deployment" "database" {
           }
           env {
             name  = "POSTGRES_DB"
-            value = "interview_prep_db"  # Set the desired database name here
+            value = "interview_prep_db"  # set the desired database name here
           }
         }
       }

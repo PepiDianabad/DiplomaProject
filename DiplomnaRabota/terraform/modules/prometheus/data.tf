@@ -1,9 +1,9 @@
 data "aws_eks_cluster" "example" {
-  name = "interview-prep-eks-cluster"  # Replace with your EKS cluster name
+  name = "interview-prep-eks-cluster"  # EKS cluster name
 }
 
 data "aws_eks_cluster_auth" "example" {
-  name = "interview-prep-eks-cluster"  # Replace with your EKS cluster name
+  name = "interview-prep-eks-cluster"  # EKS cluster name
 }
 
 data "aws_vpc" "example" {

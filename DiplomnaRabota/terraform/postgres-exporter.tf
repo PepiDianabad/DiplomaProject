@@ -2,7 +2,7 @@
 resource "kubernetes_deployment" "postgres_exporter" {
   metadata {
     name      = "postgres-exporter"
-    namespace = kubernetes_namespace.app.metadata[0].name  # Same namespace as your app
+    namespace = kubernetes_namespace.app.metadata[0].name  # Same namespace as the app
   }
   spec {
     replicas = 1
@@ -38,7 +38,7 @@ resource "kubernetes_deployment" "postgres_exporter" {
 resource "kubernetes_service" "postgres_exporter" {
   metadata {
     name      = "postgres-exporter"
-    namespace = kubernetes_namespace.app.metadata[0].name  # Same namespace as your app
+    namespace = kubernetes_namespace.app.metadata[0].name  # Same namespace as the app
   }
   spec {
     selector = {

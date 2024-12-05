@@ -3,16 +3,13 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "example" {
-  name = "interview-prep-eks-cluster"  # Replace with your EKS cluster name
+  name = "interview-prep-eks-cluster"  # eks cluster name
 }
 
 data "aws_eks_cluster_auth" "example" {
-  name = "interview-prep-eks-cluster"  # Replace with your EKS cluster name
+  name = "interview-prep-eks-cluster"  # eks cluster name
 }
 
-# module "prometheus" {
-#   source = "./prometheus"  # Ensure this path is correct
-# }
 
 # module "prometheus" {
 #   source = "terraform-aws-modules/prometheus/aws"
