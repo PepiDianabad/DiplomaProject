@@ -28,16 +28,18 @@ output "kubeconfig_token" {
 
 #sage maker outputs
 
-output "sagemaker_bucket_name" {
-  value = module.sagemaker.sagemaker_bucket_name
-}
+# output "sagemaker_bucket_name" {
+#   value = module.sagemaker.sagemaker_bucket_name
+# }
 
-output "sagemaker_endpoint_name" {
-  value = module.sagemaker.sagemaker_endpoint_name
-}
+# output "sagemaker_endpoint_name" {
+#   value = module.sagemaker.sagemaker_endpoint_name
+# }
 
-output "sagemaker_model_arn" {
-  value = module.sagemaker.sagemaker_model_arn
-}
+# output "sagemaker_model_arn" {
+#   value = module.sagemaker.sagemaker_model_arn
+# }
+
+
 
 

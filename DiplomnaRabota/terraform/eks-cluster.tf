@@ -115,6 +115,11 @@
     vpc_id       = data.aws_vpc.example.id
   }
 
+  # Reference to your Lambda submodule
+  module "lambda" {
+    source = "./modules/lambda"  # This points to the lambda module directory
+  }
+
   # Declare the VPC data source
   data "aws_vpc" "example" {
     id = "vpc-0076a3641ca670234"  
@@ -145,7 +150,7 @@
   }
 
   #sage makaker module - definition
-  module "sagemaker" {
-  source = "./sagemaker"
-}
+//  module "sagemaker" {
+//  source = "./sagemaker"
+//}
 
