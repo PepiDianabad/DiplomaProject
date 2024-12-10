@@ -26,6 +26,11 @@ resource "helm_release" "prometheus" {
           - job_name: 'node-exporter'
             static_configs:
               - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
+    prometheusService:
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     EOF
   ]
 

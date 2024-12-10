@@ -82,6 +82,13 @@ variable "private_subnets" {
 #   type        = string
 # }
 
+variable "environment" {
+  description = "Environment (dev, prod, etc.)"
+  type        = string
+  default     = "dev"
+}
+
+
 
 
 
