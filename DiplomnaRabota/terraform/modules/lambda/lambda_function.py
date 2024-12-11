@@ -37,10 +37,10 @@ def lambda_handler(event, context):
             # Log the received data
             logger.info(f"Data: {response_json}")
             
-            # Save to S3
-            save_to_s3(response_json)
+            # Append the new data to the S3 file
+            append_to_s3(response_json)
             
-            return {"message": "Data successfully saved to S3", "data": response_json}
+            return {"message": "Data successfully appended to S3 file"}
         else:
             logger.error(f"Error response from Prometheus: {response.text}")
             return {"error": "Failed to query Prometheus", "details": response.text}
@@ -48,21 +48,35 @@ def lambda_handler(event, context):
         logger.error(f"Error: {str(e)}")
         raise e
 
-def save_to_s3(data):
+def append_to_s3(data):
     try:
         # Define the S3 bucket name and file key
         bucket_name = "ppetrov-prometheus-metrics-s3"
-        timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        file_key = f"metrics/prometheus_response_{timestamp}.json"
+        file_key = "metrics/prometheus_data.jsonl"  # Use a JSONL (JSON Lines) format
         
-        # Convert the data to a JSON string
-        json_data = json.dumps(data)
+        # Convert the new data to a JSON string
+        new_line = json.dumps({
+            "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "data": data
+        }) + "\n"
         
-        # Upload to S3
-        logger.info(f"Saving data to S3 bucket '{bucket_name}' with key '{file_key}'")
-        s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=json_data)
+        # Read the existing file from S3 if it exists
+        try:
+            logger.info(f"Fetching existing file from S3: {file_key}")
+            existing_object = s3_client.get_object(Bucket=bucket_name, Key=file_key)
+            existing_content = existing_object["Body"].read().decode("utf-8")
+        except s3_client.exceptions.NoSuchKey:
+            logger.info(f"No existing file found. A new file will be created.")
+            existing_content = ""
         
-        logger.info("Data successfully saved to S3.")
+        # Append the new line to the existing content
+        updated_content = existing_content + new_line
+        
+        # Upload the updated content back to S3
+        logger.info(f"Updating file in S3 bucket '{bucket_name}' with key '{file_key}'")
+        s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=updated_content)
+        
+        logger.info("Data successfully appended to S3 file.")
     except Exception as e:
-        logger.error(f"Failed to save data to S3: {str(e)}")
+        logger.error(f"Failed to append data to S3: {str(e)}")
         raise e
