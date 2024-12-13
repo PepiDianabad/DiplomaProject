@@ -77,18 +77,24 @@ def append_to_s3(prometheus_data):
 
 def transform_to_deepar(prometheus_data):
     try:
-        transformed_records = []
+        logger.info(f"Prometheus Response JSON: {json.dumps(prometheus_data, indent=2)}")
 
-        # Parse the Prometheus response and structure data for DeepAR
+        # Validate keys
+        if "data" not in prometheus_data or "result" not in prometheus_data["data"]:
+            raise KeyError("Expected keys 'data' and 'result' are missing in Prometheus response")
+
+        transformed_records = []
         timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        for result in prometheus_data["data"]["data"]["result"]:
+        
+        # Iterate over results
+        for result in prometheus_data["data"]["result"]:
             instance = result["metric"]["instance"]
-            value = float(result["value"][1])
+            value = float(result["value"][1])  # Extract the second element in "value" array
 
             # Create or append to a time series for the instance
             transformed_records.append({
-                "start": timestamp,  # The start timestamp for the series
-                "target": [value],  # Add this value as part of the target array
+                "start": timestamp,
+                "target": [value],
                 "instance": instance
             })
 
@@ -97,3 +103,4 @@ def transform_to_deepar(prometheus_data):
     except Exception as e:
         logger.error(f"Failed to transform data: {str(e)}")
         raise e
+
