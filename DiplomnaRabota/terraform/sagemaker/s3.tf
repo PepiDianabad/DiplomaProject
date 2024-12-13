@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "sagemaker_data_bucket" {
   bucket = "ppetrov-sagemaker-data"
-  acl    = "private"
 
   tags = {
     Name        = "SageMaker Data Bucket"

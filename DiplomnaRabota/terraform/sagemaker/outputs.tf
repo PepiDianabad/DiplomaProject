@@ -1,9 +1,9 @@
 output "sagemaker_model_name" {
-  value = aws_sagemaker_model.depar_model.name
+  value = aws_sagemaker_model.deepar_model.name
 }
 
 output "sagemaker_endpoint_name" {
-  value = aws_sagemaker_endpoint.depar_endpoint.name
+  value = aws_sagemaker_endpoint.deepar_endpoint.name
 }
 
 output "sagemaker_execution_role_arn" {

@@ -150,7 +150,7 @@
   }
 
   #sage makaker module - definition
-//  module "sagemaker" {
-//  source = "./sagemaker"
-//}
+  module "sagemaker" {
+  source = "./sagemaker"
+}
 
