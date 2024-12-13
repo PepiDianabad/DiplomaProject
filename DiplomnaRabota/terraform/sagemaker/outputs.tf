@@ -1,12 +1,11 @@
-# In outputs.tf within the sagemaker module
-output "sagemaker_bucket_name" {
-  value = aws_s3_bucket.sagemaker_bucket.bucket
+output "sagemaker_model_name" {
+  value = aws_sagemaker_model.depar_model.name
 }
 
 output "sagemaker_endpoint_name" {
-  value = aws_sagemaker_endpoint.endpoint.name
+  value = aws_sagemaker_endpoint.depar_endpoint.name
 }
 
-output "sagemaker_model_arn" {
-  value = aws_sagemaker_model.my_model.arn
+output "sagemaker_execution_role_arn" {
+  value = aws_iam_role.sagemaker_execution_role.arn
 }
