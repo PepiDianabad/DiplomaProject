@@ -6,7 +6,7 @@ import boto3
 from io import BytesIO
 
 # Initialize the S3 client
-s3 = boto3.client('s3', region_name='us-east-1')  # Specify your region
+s3 = boto3.client('s3', region_name='eu-central-1')  # Specify your region
 
 # Load the dataset from local file
 def load_data(data_path):
@@ -28,7 +28,7 @@ def load_data(data_path):
 
 # Fit ARIMA model
 def fit_arima(data):
-    model = ARIMA(data['target_value'], order=(1, 1, 1))  # Adjust ARIMA order if needed
+    model = ARIMA(data['target_value'], order=(3, 1, 0))  # Adjust ARIMA order if needed
     model_fit = model.fit()
     return model_fit
 
