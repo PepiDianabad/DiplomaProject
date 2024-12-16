@@ -6,7 +6,7 @@ import boto3
 from io import BytesIO
 
 # Initialize the S3 client
-s3 = boto3.client('s3', region_name='eu-central-1')  # Specify your region
+s3 = boto3.client('s3', region_name='eu-central-1')  
 
 # Load the dataset from local file
 def load_data(data_path):
@@ -47,9 +47,9 @@ def save_model_to_s3(model_fit, bucket_name, s3_model_path):
     s3.upload_fileobj(model_buffer, bucket_name, s3_model_path)
 
 def main():
-    data_path = 'model_data.jsonl'  # Local file path
-    bucket_name = 'arima-model'  # Replace with your S3 bucket name
-    s3_model_path = 'arima_model.pkl'  # Path where you want to store the model in S3
+    data_path = 'model_data.jsonl'  
+    bucket_name = 'arima-model'  
+    s3_model_path = 'arima_model.pkl'  
 
     # Load data from local file
     data = load_data(data_path)
