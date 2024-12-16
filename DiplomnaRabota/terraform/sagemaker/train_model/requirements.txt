@@ -1,0 +1,5 @@
+statsmodels
+pandas
+boto3
+numpy
+
