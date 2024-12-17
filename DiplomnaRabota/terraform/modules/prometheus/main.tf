@@ -34,7 +34,7 @@ resource "helm_release" "prometheus" {
     EOF
   ]
 
-  timeout = 600  # timeout in seconds (10 minutes = 600 seconds)
+  timeout = 300  # timeout in seconds (10 minutes = 600 seconds)
 
   depends_on = [
     data.aws_eks_cluster.example  # data source instead of resource

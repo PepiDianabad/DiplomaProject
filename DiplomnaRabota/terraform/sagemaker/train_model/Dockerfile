@@ -3,7 +3,6 @@ FROM python:3.9-slim
 # Install Python dependencies
 RUN pip install pandas statsmodels flask boto3
 
-# Copy your model and script into the container
 COPY models/arima_model.pkl /opt/ml/model/
 COPY arima_interface.py /app/arima_interface.py
 
