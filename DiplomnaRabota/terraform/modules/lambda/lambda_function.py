@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     logger.info("Starting Lambda Execution...")
     try:
         # Prometheus API endpoint
-        prometheus_url = "http://a1bcff183c8064cee907308015e818ce-1619549014.eu-central-1.elb.amazonaws.com:9090/api/v1/query"
+        prometheus_url = "http://a1bcff183c8064cee907308015e818ce-298329086.eu-central-1.elb.amazonaws.com:9090/api/v1/query"
         
         # Query for Prometheus
         query = "avg(node_memory_MemFree_bytes / node_memory_MemTotal_bytes) by (instance)"
