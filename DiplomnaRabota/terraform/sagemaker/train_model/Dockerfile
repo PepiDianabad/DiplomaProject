@@ -7,10 +7,11 @@ COPY models/arima_model.pkl /opt/ml/model/
 COPY arima_interface.py /app/arima_interface.py
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /
 
 # Expose the Flask app's port
 EXPOSE 8080
 
 # Run the Flask app
-CMD ["python", "arima_interface.py"]
+ENTRYPOINT ["python", "/app/arima_interface.py"]
+
