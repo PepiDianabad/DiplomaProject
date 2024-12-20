@@ -5,78 +5,106 @@ from flask import Flask, request, jsonify
 from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO, StringIO
 
+# Define S3 bucket and keys for both the model and metrics
+model_bucket = "arima-model"
+model_key = "arima_model.pkl"
+metrics_bucket = "ppetrov-prometheus-metrics-s3"
+metrics_key = "metrics/model_data.jsonl"
+
 app = Flask(__name__)
 
-def model_fn(model_dir):
-    """Load the trained ARIMA model from S3"""
+def load_model_from_s3(bucket_name, object_key):
+    """Load the trained ARIMA model from S3."""
     s3 = boto3.client('s3')
-    
-    # Extract the bucket name and model file path from model_dir
-    bucket_name = model_dir.split('/')[0]
-    object_key = '/'.join(model_dir.split('/')[1:]) + '/arima_model.pkl'  # Ensure path format is correct
-
-    # Download the model from S3 into a buffer
     model_buffer = BytesIO()
-    s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=model_buffer)
+    try:
+        s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=model_buffer)
+        print(f"Model successfully downloaded from s3://{bucket_name}/{object_key}")
+        model_buffer.seek(0)
+        model = pickle.load(model_buffer)
+        print("Model successfully loaded.")
+        return model
+    except Exception as e:
+        print(f"Error loading model: {str(e)}")
+        raise
 
-    # Load the model from the buffer using pickle
-    model_buffer.seek(0)
-    model = pickle.load(model_buffer)
-    return model
-
-def load_data_from_s3(s3_path):
-    """Load model data from S3"""
+def load_metrics_from_s3(bucket_name, object_key):
+    """Load metrics data from S3."""
     s3 = boto3.client('s3')
-    bucket_name = s3_path.split('/')[0]
-    object_key = '/'.join(s3_path.split('/')[1:])
-
-    # Download the file into memory
     file_buffer = BytesIO()
-    s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=file_buffer)
+    try:
+        s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=file_buffer)
+        print(f"Metrics file successfully downloaded from s3://{bucket_name}/{object_key}")
+        file_buffer.seek(0)
+        data_str = file_buffer.getvalue().decode('utf-8')
+        # Assuming JSONL format (one JSON object per line)
+        data = pd.read_json(StringIO(data_str), lines=True)
+        print("Metrics successfully loaded into DataFrame.")
 
-    # Read it into a pandas DataFrame
-    file_buffer.seek(0)
-    data_str = file_buffer.getvalue().decode('utf-8')
-    data = pd.read_json(StringIO(data_str), lines=True)
+        print("First rows:")
+        print(data.head())
 
-    # Preprocess the data (similar to your local code)
-    data['start'] = pd.to_datetime(data['start'], errors='coerce')  # Convert 'start' column to datetime
-    data['target_value'] = data['target'].apply(lambda x: x[0] if isinstance(x, list) else None)
-    data = data[['start', 'target_value']].dropna()  # Drop rows with NaN target_value
-    data.set_index('start', inplace=True)
-    return data
+        print("Last 3 rows of data:")
+        print(data.tail(3))
 
-# Load the ARIMA model from S3 when the app starts
-model = model_fn('arima-model')
+        return data
+    except Exception as e:
+        print(f"Error loading metrics: {str(e)}")
+        raise
+
+def preprocess_metrics(data):
+    """Preprocess metrics data for forecasting."""
+    try:
+        data['start'] = pd.to_datetime(data['start'], errors='coerce')  # Convert 'start' column to datetime
+        data['target_value'] = data['target'].apply(lambda x: x[0] if isinstance(x, list) else None)
+        data = data[['start', 'target_value']].dropna()  # Drop rows with NaN target_value
+        data.set_index('start', inplace=True)
+        return data
+    except Exception as e:
+        print(f"Error during preprocessing: {str(e)}")
+        raise
+
+# Load the ARIMA model when the app starts
+model = load_model_from_s3(model_bucket, model_key)
 
 @app.route('/ping', methods=['GET'])
 def ping():
-    """Health check endpoint for SageMaker"""
+    """Health check endpoint for SageMaker."""
     return jsonify({"status": "Healthy"}), 200
 
 @app.route('/invocations', methods=['POST'])
 def predict():
-    """Perform prediction using the loaded ARIMA model"""
+    """Perform prediction using metrics data."""
     input_data = request.get_json()
 
-    # Load the data from S3 (or the request if needed)
-    s3_path = input_data.get("s3_path")
-    if not s3_path:
-        return jsonify({"error": "Invalid input, missing 's3_path'"}), 400
-
     try:
-        # Load the data from the specified S3 path
-        data = load_data_from_s3(s3_path)
+        # Load and preprocess metrics data from S3
+        metrics_data = load_metrics_from_s3(metrics_bucket, metrics_key)
+        preprocessed_data = preprocess_metrics(metrics_data)
+
+        # Split data into train and test sets (80-20 split)
+        train_size = int(len(preprocessed_data) * 0.8)
+        train_data = preprocessed_data[:train_size]
+        test_data = preprocessed_data[train_size:]
+
+        # Fit the ARIMA model on the training data
+        arima_model = ARIMA(train_data['target_value'], order=(5, 1, 0)) 
+        model_fit = arima_model.fit()
+
+        # Make predictions on the test set
+        forecast = model_fit.forecast(steps=len(test_data))
+
+        # Make future predictions (next 6 scrapes - 30 mins)
+        forecast_steps = 6  # Number of future steps to predict
+        future_forecast = model_fit.forecast(steps=forecast_steps)
+
+        # Return predictions in the response
+        return jsonify({
+            'predictions': forecast.tolist(),
+            'future_predictions': future_forecast.tolist()
+        }), 200
     except Exception as e:
-        return jsonify({"error": f"Error loading data from S3: {str(e)}"}), 400
-
-    # Make predictions using the ARIMA model
-    forecast_steps = len(data)
-    forecast = model.forecast(steps=forecast_steps)
-
-    # Return the forecasted values in the response
-    return jsonify({'predictions': forecast.tolist()}), 200
+        return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    # Run the Flask app with host set to '0.0.0.0' for SageMaker compatibility
     app.run(host='0.0.0.0', port=8081)

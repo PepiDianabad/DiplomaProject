@@ -49,7 +49,7 @@ def append_to_s3(prometheus_data):
     try:
         # Define the S3 bucket name and file key
         bucket_name = "ppetrov-prometheus-metrics-s3"
-        file_key = "metrics/deepar_data.jsonl"  # Use a JSONL (JSON Lines) format
+        file_key = "metrics/model_data.jsonl"  # Use a JSONL (JSON Lines) format
 
         # Transform Prometheus data to DeepAR format
         transformed_data = transform_to_deepar(prometheus_data)

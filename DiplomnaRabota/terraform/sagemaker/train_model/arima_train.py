@@ -1,65 +1,87 @@
-import pandas as pd
-from statsmodels.tsa.arima.model import ARIMA
-import json
 import pickle
 import boto3
-from io import BytesIO
+import pandas as pd
+from flask import Flask, request, jsonify
+from statsmodels.tsa.arima.model import ARIMA
+from io import BytesIO, StringIO
 
-# Initialize the S3 client
-s3 = boto3.client('s3', region_name='eu-central-1')  
+# Define S3 bucket and keys for both the model and metrics
+model_bucket = "arima-model"
+model_key = "arima_model.pkl"
+metrics_bucket = "ppetrov-prometheus-metrics-s3"
+metrics_key = "metrics/model_data.jsonl"
 
-# Load the dataset from local file
-def load_data(data_path):
-    data = []
-    with open(data_path, 'r') as file:
-        for line in file:
-            # Parse each line as JSON
-            json_data = json.loads(line.strip())
-            # Extract relevant fields
-            start = json_data.get('start')
-            target = json_data.get('target')[0] if json_data.get('target') else None  # Extract the first value in 'target' list
-            # Append to data list
-            data.append({'start': start, 'target_value': target})
+app = Flask(__name__)
 
-    # Create DataFrame from the parsed data
-    df = pd.DataFrame(data)
-    return df
-
-# Fit ARIMA model
-def fit_arima(data):
-    model = ARIMA(data['target_value'], order=(5, 1, 0))  # Adjust ARIMA order if needed
-    model_fit = model.fit()
-    return model_fit
-
-# Save the model and upload it to S3
-def save_model_to_s3(model_fit, bucket_name, s3_model_path):
-    # Create a BytesIO buffer to hold the model
+def load_model_from_s3(bucket_name, object_key):
+    """Load the trained ARIMA model from S3."""
+    s3 = boto3.client('s3')
     model_buffer = BytesIO()
-    
-    # Save the model to the buffer using pickle
-    pickle.dump(model_fit, model_buffer)
-    
-    # Make sure the buffer's position is at the beginning
-    model_buffer.seek(0)
-    
-    # Upload the model to S3
-    s3.upload_fileobj(model_buffer, bucket_name, s3_model_path)
+    try:
+        s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=model_buffer)
+        print(f"Model successfully downloaded from s3://{bucket_name}/{object_key}")
+        model_buffer.seek(0)
+        model = pickle.load(model_buffer)
+        print("Model successfully loaded.")
+        return model
+    except Exception as e:
+        print(f"Error loading model: {str(e)}")
+        raise
 
-def main():
-    data_path = 'model_data.jsonl'  
-    bucket_name = 'arima-model'  
-    s3_model_path = 'arima_model.pkl'  
+def load_metrics_from_s3(bucket_name, object_key):
+    """Load metrics data from S3."""
+    s3 = boto3.client('s3')
+    file_buffer = BytesIO()
+    try:
+        s3.download_fileobj(Bucket=bucket_name, Key=object_key, Fileobj=file_buffer)
+        print(f"Metrics file successfully downloaded from s3://{bucket_name}/{object_key}")
+        file_buffer.seek(0)
+        data_str = file_buffer.getvalue().decode('utf-8')
+        data = pd.read_json(StringIO(data_str), lines=True)
+        print("Metrics successfully loaded into DataFrame.")
+        return data
+    except Exception as e:
+        print(f"Error loading metrics: {str(e)}")
+        raise
 
-    # Load data from local file
-    data = load_data(data_path)
-    
-    # Train ARIMA model
-    model_fit = fit_arima(data)
-    
-    # Save the trained model to S3
-    save_model_to_s3(model_fit, bucket_name, s3_model_path)
+def preprocess_metrics(data):
+    """Preprocess metrics data for forecasting."""
+    try:
+        data['start'] = pd.to_datetime(data['start'], errors='coerce')  # Convert 'start' column to datetime
+        data['target_value'] = data['target'].apply(lambda x: x[0] if isinstance(x, list) else None)
+        data = data[['start', 'target_value']].dropna()  # Drop rows with NaN target_value
+        data.set_index('start', inplace=True)
+        return data
+    except Exception as e:
+        print(f"Error during preprocessing: {str(e)}")
+        raise
 
-    print(f"Model successfully uploaded to S3 at {s3_model_path}")
+# Load the ARIMA model when the app starts
+model = load_model_from_s3(model_bucket, model_key)
 
-if __name__ == "__main__":
-    main()
+@app.route('/ping', methods=['GET'])
+def ping():
+    """Health check endpoint for SageMaker."""
+    return jsonify({"status": "Healthy"}), 200
+
+@app.route('/invocations', methods=['POST'])
+def predict():
+    """Perform prediction using metrics data."""
+    input_data = request.get_json()
+
+    try:
+        # Load and preprocess metrics data from S3
+        metrics_data = load_metrics_from_s3(metrics_bucket, metrics_key)
+        preprocessed_data = preprocess_metrics(metrics_data)
+
+        # Make predictions using the ARIMA model
+        forecast_steps = len(preprocessed_data)
+        forecast = model.forecast(steps=forecast_steps)
+
+        # Return predictions in the response
+        return jsonify({'predictions': forecast.tolist()}), 200
+    except Exception as e:
+        return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8081)
