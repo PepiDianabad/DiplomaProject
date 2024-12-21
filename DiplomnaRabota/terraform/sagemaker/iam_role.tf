@@ -20,7 +20,7 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      # Access to S3 Bucket
+      # Access to model S3 Bucket
       {
         Effect   = "Allow",
         Action   = [
@@ -31,6 +31,18 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
         Resource = [
           "arn:aws:s3:::arima-model",         # S3 bucket
           "arn:aws:s3:::arima-model/*"        # Objects in the bucket
+        ]
+      },
+      # Access to metrics S3 Bucket
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::ppetrov-prometheus-metrics-s3", # S3 bucket
+          "arn:aws:s3:::ppetrov-prometheus-metrics-s3/*" # Objects in the bucket
         ]
       },
       # CloudWatch Logs permissions
@@ -50,7 +62,7 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
         Resource = "*"
       },
       # ECR Permissions
-            {
+      {
         Effect = "Allow",
         Action = [
           "ecr:GetDownloadUrlForLayer",
@@ -67,6 +79,7 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
     ]
   })
 }
+
 
 output "sagemaker_role_arn" {
   value = aws_iam_role.sagemaker_execution_role.arn
