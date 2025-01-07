@@ -10,6 +10,8 @@ model_bucket = "arima-model"
 model_key = "arima_model.pkl"
 metrics_bucket = "ppetrov-prometheus-metrics-s3"
 metrics_key = "metrics/model_data.jsonl"
+sns_topic_arn = "arn:aws:sns:eu-central-1:722377226063:predition-alerts"  # Replace with your SNS Topic ARN
+prediction_threshold = 0.40  # Replace with your desired threshold
 
 app = Flask(__name__)
 
@@ -72,11 +74,27 @@ def ping():
     """Health check endpoint for SageMaker."""
     return jsonify({"status": "Healthy"}), 200
 
+def send_sns_notification(predictions):
+    """Send an SNS notification if predictions exceed the threshold."""
+    sns = boto3.client('sns')
+    try:
+        message = (
+            f"Attention: The predicted values have exceeded the threshold ({prediction_threshold}).\n"
+            f"Predictions: {predictions}"
+        )
+        response = sns.publish(
+            TopicArn=sns_topic_arn,
+            Subject="Alert: Prediction Threshold Exceeded",
+            Message=message
+        )
+        print("SNS Notification sent successfully:", response)
+    except Exception as e:
+        print(f"Error sending SNS notification: {str(e)}")
+        raise
+
 @app.route('/invocations', methods=['POST'])
 def predict():
     """Perform prediction using metrics data."""
-    input_data = request.get_json()
-
     try:
         # Load and preprocess metrics data from S3
         metrics_data = load_metrics_from_s3(metrics_bucket, metrics_key)
@@ -98,13 +116,17 @@ def predict():
         forecast_steps = 6  # Number of future steps to predict
         future_forecast = model_fit.forecast(steps=forecast_steps)
 
+        # Check if predictions exceed the threshold
+        if any(value > prediction_threshold for value in future_forecast):
+            send_sns_notification(future_forecast.tolist())
+
         # Return predictions in the response
         return jsonify({
             'predictions': forecast.tolist(),
-            'future_predictions': future_forecast.tolist()
+            'future_predictions': future_forecast.tolist(),
+            'threshold': prediction_threshold
         }), 200
     except Exception as e:
         return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8081)

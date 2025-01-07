@@ -149,8 +149,14 @@
     value       = module.irsa-ebs-csi.iam_role_arn
   }
 
-   #sage makaker module - definition
+   #sage maker module - definition
    module "sagemaker" {
    source = "./sagemaker"
  }
+  #sns module - definiton
+   module "sns" {
+  source = "./sns"
+}
+
+
 
