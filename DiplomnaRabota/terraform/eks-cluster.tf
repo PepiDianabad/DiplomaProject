@@ -156,7 +156,7 @@
   #sns module - definiton
    module "sns" {
   source = "./sns"
-}
+ }
 
 
 

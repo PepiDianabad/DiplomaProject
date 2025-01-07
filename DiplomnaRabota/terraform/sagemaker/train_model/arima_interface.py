@@ -10,8 +10,12 @@ model_bucket = "arima-model"
 model_key = "arima_model.pkl"
 metrics_bucket = "ppetrov-prometheus-metrics-s3"
 metrics_key = "metrics/model_data.jsonl"
-sns_topic_arn = "arn:aws:sns:eu-central-1:722377226063:predition-alerts"  # Replace with your SNS Topic ARN
-prediction_threshold = 0.40  # Replace with your desired threshold
+sns_topic_arn = "arn:aws:sns:eu-central-1:722377226063:prediction-alerts"  # Replace with your SNS Topic ARN
+node_thresholds = {
+    1: 0.05,  # Threshold for Node 1
+    2: 0.04,  # Threshold for Node 2
+    3: 0.42   # Threshold for Node 3
+}
 
 app = Flask(__name__)
 
@@ -74,14 +78,14 @@ def ping():
     """Health check endpoint for SageMaker."""
     return jsonify({"status": "Healthy"}), 200
 
-def send_sns_notification(predictions):
-    """Send an SNS notification if predictions exceed the threshold."""
+def send_sns_notification(node_exceedances):
+    """Send an SNS notification if predictions for any node exceed their thresholds."""
     sns = boto3.client('sns')
     try:
-        message = (
-            f"Attention: The predicted values have exceeded the threshold ({prediction_threshold}).\n"
-            f"Predictions: {predictions}"
-        )
+        message = "Attention: Prediction thresholds exceeded for the following nodes:\n"
+        for node, predictions in node_exceedances.items():
+            message += f"Node {node}: {predictions}\n"
+        
         response = sns.publish(
             TopicArn=sns_topic_arn,
             Subject="Alert: Prediction Threshold Exceeded",
@@ -116,17 +120,31 @@ def predict():
         forecast_steps = 6  # Number of future steps to predict
         future_forecast = model_fit.forecast(steps=forecast_steps)
 
-        # Check if predictions exceed the threshold
-        if any(value > prediction_threshold for value in future_forecast):
-            send_sns_notification(future_forecast.tolist())
+        # Group predictions by nodes (e.g., 1st, 2nd, 3rd values correspond to Node 1, Node 2, Node 3)
+        node_predictions = {node: [] for node in node_thresholds.keys()}
+        for i, prediction in enumerate(future_forecast):
+            node_id = (i % len(node_thresholds)) + 1  # Map prediction index to node ID (1, 2, 3)
+            node_predictions[node_id].append(prediction)
+
+        # Check if predictions exceed the thresholds for each node
+        node_exceedances = {}
+        for node, predictions in node_predictions.items():
+            exceedances = [value for value in predictions if value > node_thresholds[node]]
+            if exceedances:
+                node_exceedances[node] = exceedances
+
+        # Send notification if any node exceeds its threshold
+        if node_exceedances:
+            send_sns_notification(node_exceedances)
 
         # Return predictions in the response
         return jsonify({
             'predictions': forecast.tolist(),
             'future_predictions': future_forecast.tolist(),
-            'threshold': prediction_threshold
+            'node_predictions': node_predictions
         }), 200
     except Exception as e:
         return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0', port=8080)
