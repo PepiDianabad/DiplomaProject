@@ -75,11 +75,16 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
         Effect = "Allow",
         Action = "ecr:GetAuthorizationToken",
         Resource = "*"
+      },
+      # SNS Publish permissions for prediction alerts
+      {
+        Effect   = "Allow",
+        Action   = "SNS:Publish",
+        Resource = "arn:aws:sns:eu-central-1:722377226063:prediction-alerts"
       }
     ]
   })
 }
-
 
 output "sagemaker_role_arn" {
   value = aws_iam_role.sagemaker_execution_role.arn
