@@ -86,6 +86,4 @@ resource "aws_iam_role_policy" "sagemaker_policy" {
   })
 }
 
-output "sagemaker_role_arn" {
-  value = aws_iam_role.sagemaker_execution_role.arn
-}
+
