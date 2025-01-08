@@ -34,7 +34,7 @@ Interview.init({
 // Define the relation back to User - UserId in the Interview table refers to the ID in the User table
 Interview.belongsTo(User, {
   foreignKey: 'userId', // This should match the userId in the User model
-  onDelete: 'CASCADE', // Optional: specify what happens when a user is deleted
+  onDelete: 'CASCADE', // Specify whether you want rows deleted in a child table when corresponding rows are deleted in the parent table
 });
 
 module.exports = Interview;
