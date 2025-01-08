@@ -67,21 +67,6 @@ variable "private_subnets" {
   default     = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 }
 
-# variable "cluster_endpoint" {
-#   description = "EKS Cluster endpoint for Kubernetes provider"
-#   type        = string
-# }
-
-# variable "kubeconfig_token" {
-#   description = "Authentication token for Kubernetes"
-#   type        = string
-# }
-
-# variable "cluster_ca_certificate" {
-#   description = "CA Certificate for Kubernetes cluster"
-#   type        = string
-# }
-
 variable "environment" {
   description = "Environment (dev, prod, etc.)"
   type        = string

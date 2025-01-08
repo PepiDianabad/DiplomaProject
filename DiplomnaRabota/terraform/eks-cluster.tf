@@ -115,15 +115,10 @@
     vpc_id       = "vpc-0076a3641ca670234"  
   }
 
-  # Reference to your Lambda submodule
+  # Reference to Lambda submodule
   module "lambda" {
     source = "./modules/lambda"  # This points to the lambda module directory
   }
-
-  # Declare the VPC data source
-   #data "aws_vpc" "example" {
-    # id = "vpc-0076a3641ca670234"  
-   #}
 
   # Declare the Subnet data source
   data "aws_subnets" "example" {
@@ -149,11 +144,11 @@
     value       = module.irsa-ebs-csi.iam_role_arn
   }
 
-   #sage maker module - definition
+   # Reference to SageMaker submodule
    module "sagemaker" {
    source = "./sagemaker"
  }
-  #sns module - definiton
+   # Reference to SNS submodule
    module "sns" {
   source = "./sns"
  }

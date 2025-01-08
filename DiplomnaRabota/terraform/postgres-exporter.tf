@@ -26,7 +26,7 @@ resource "kubernetes_deployment" "postgres_exporter" {
           }
           env {
             name  = "DATA_SOURCE_NAME"
-            value = "postgresql://postgres:password@postgres:5432/interview_prep_db?sslmode=disable"  # Adjust connection string as needed
+            value = "postgresql://postgres:password@postgres:5432/interview_prep_db?sslmode=disable"  # Adjust connection string
           }
         }
       }
