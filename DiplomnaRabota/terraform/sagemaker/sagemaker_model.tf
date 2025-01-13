@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-central-1" # Replace with your AWS region
+  region = "eu-central-1" 
 }
 
 # SageMaker Model
