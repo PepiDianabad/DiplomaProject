@@ -47,12 +47,6 @@ const Interview = () => {
       return;
     }
 
-    const currentFeedback = `Feedback for your answer: "${answer}"`;
-    setFeedback(prevFeedback => [
-      ...prevFeedback,
-      { question: questions[currentQuestion], answer, feedback: currentFeedback }
-    ]);
-
     setAnswers(prevAnswers => [...prevAnswers, answer]); // add answer to answers array
 
     if (currentQuestion < questions.length - 1) {

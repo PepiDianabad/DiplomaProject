@@ -5,11 +5,10 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Helper function to generate AI feedback for the whole interview
 async function generateAIFeedback(feedbackData) {
 
     // Destructure questions and answers from feedbackData
-    const { questions, answers } = feedbackData; // Use feedbackData directly
+    const { questions, answers } = feedbackData; 
 
     // Check if questions and answers are defined
     if (!questions || !answers) {
