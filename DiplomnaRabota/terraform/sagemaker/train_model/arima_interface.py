@@ -109,6 +109,8 @@ def predict():
         train_data = preprocessed_data[:train_size]
         test_data = preprocessed_data[train_size:]
 
+        print(train_data)
+
         # Fit the ARIMA model on the training data
         arima_model = ARIMA(train_data['target_value'], order=(5, 1, 0)) 
         model_fit = arima_model.fit()
@@ -147,4 +149,4 @@ def predict():
         return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8081)
