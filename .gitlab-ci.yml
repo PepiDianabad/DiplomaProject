@@ -1,7 +1,11 @@
 stages:
   - validate
   - plan
-
+  # - apply
+  # - output
+  - lint
+  - checkov
+  # - destroy
 
 image:
   name: hashicorp/terraform:light
@@ -14,13 +18,12 @@ before_script:
   - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
   - rm -rf .terraform
   - terraform --version
-  # - terraform init
 
 validate:
   stage: validate
   script:
-    - cd DiplomnaRabota/terraform   
-    - terraform init 
+    - cd DiplomnaRabota/terraform
+    - terraform init
     - terraform validate
   tags:
     - ci-shared
@@ -28,10 +31,56 @@ validate:
 plan:
   stage: plan
   script:
-    - cd DiplomnaRabota/terraform   
+    - cd DiplomnaRabota/terraform
     - terraform init
     - terraform plan
   dependencies:
     - validate
   tags:
     - ci-shared
+
+# apply:
+#   stage: apply
+#   script:
+#     - cd DiplomnaRabota/terraform
+#     - terraform init
+#     - terraform apply -auto-approve
+#   dependencies:
+#     - plan
+#   tags:
+#     - ci-shared
+
+# output:
+#   stage: output
+#   script:
+#     - cd DiplomnaRabota/terraform
+#     - terraform output
+#   dependencies:
+#     - apply
+#   tags:
+#     - ci-shared
+
+lint:
+  stage: lint
+  script:
+    - cd DiplomnaRabota/terraform
+    - tflint
+  tags:
+    - ci-shared
+
+checkov:
+  stage: checkov
+  script:
+    - cd DiplomnaRabota/terraform
+    - checkov -d . --framework terraform
+  tags:
+    - ci-shared
+
+# destroy:
+#   stage: destroy
+#   script:
+#     - cd DiplomnaRabota/terraform
+#     - terraform destroy -auto-approve
+#   when: manual
+#   tags:
+#     - ci-shared
