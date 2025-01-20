@@ -1,0 +1,25 @@
+stages:
+  - validate
+  - plan
+  - apply
+
+variables:
+  TF_IN_AUTOMATION: "true"
+  TF_LOG: "INFO"
+
+validate:
+  stage: validate
+  script:
+    - cd DiplomnaRabota/terraform     # Отиди в директорията с Terraform кода
+    - terraform init                 # Инициализирай Terraform
+    - terraform validate             # Провери валидността на конфигурацията
+
+plan:
+  stage: plan
+  script:
+    - cd DiplomnaRabota/terraform     # Отиди в директорията с Terraform кода
+    - terraform init                 # Инициализирай Terraform
+    - terraform plan                 # Изготви план за прилагане на промените
+
+  only:
+    - main                           # Изпълнявай само за промените в главния клон
