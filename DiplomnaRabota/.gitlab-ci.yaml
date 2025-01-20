@@ -2,6 +2,7 @@ stages:
   - validate
   - plan
 
+
 image:
   name: hashicorp/terraform:light
   entrypoint:
@@ -15,22 +16,19 @@ before_script:
   - terraform --version
   - terraform init
 
-
 validate:
   stage: validate
+  script:
+    - terraform validate
   tags:
     - ci-shared
-  script:
-    - cd DiplomnaRabota/terraform                    
-    - terraform validate             
 
 plan:
   stage: plan
-  tags:
-    - ci-shared  # Този таг трябва да съвпадне с таг на вашия runner
   script:
-    - cd DiplomnaRabota/terraform                    
-    - terraform plan                 
-
-  only:
-    - main                           
+    - terraform init
+    - terraform plan
+  dependencies:
+    - validate
+  tags:
+    - ci-shared
