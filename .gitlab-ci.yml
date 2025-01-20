@@ -19,11 +19,11 @@ before_script:
   - rm -rf .terraform
   - terraform --version
    # Install tflint using curl
+   # Install tflint using curl
   - curl -sLo tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.43.0/tflint_linux_amd64.zip
   - unzip tflint.zip
-  - mv tflint /usr/local/bin/
-  - tflint --version
-
+  - chmod +x tflint
+  - ./tflint --version
 validate:
   stage: validate
   script:
