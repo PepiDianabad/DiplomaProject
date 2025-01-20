@@ -1,7 +1,6 @@
 stages:
   - validate
   - plan
-  - apply
 
 variables:
   TF_IN_AUTOMATION: "true"
