@@ -69,6 +69,7 @@ lint:
   stage: lint
   script:
     - cd DiplomnaRabota/terraform
+    - /home/gitlab-runner/builds/uZaqzEMz/0/elsys/petar-petrov/tflint --config ./tflint.hcl
     - tflint
   tags:
     - ci-shared
