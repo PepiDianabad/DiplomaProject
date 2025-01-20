@@ -1,0 +1,25 @@
+stages:
+  - validate
+  - plan
+  - apply
+
+variables:
+  TF_IN_AUTOMATION: "true"
+  TF_LOG: "INFO"
+
+validate:
+  stage: validate
+  script:
+    - cd DiplomnaRabota/terraform    
+    - terraform init                 
+    - terraform validate             
+
+plan:
+  stage: plan
+  script:
+    - cd DiplomnaRabota/terraform     
+    - terraform init                 
+    - terraform plan                 
+
+  only:
+    - main                           
