@@ -9,6 +9,8 @@ variables:
 
 validate:
   stage: validate
+  tags:
+    - ci-shared
   script:
     - cd DiplomnaRabota/terraform    
     - terraform init                 
@@ -16,6 +18,8 @@ validate:
 
 plan:
   stage: plan
+  tags:
+    - ci-shared  # Този таг трябва да съвпадне с таг на вашия runner
   script:
     - cd DiplomnaRabota/terraform     
     - terraform init                 
