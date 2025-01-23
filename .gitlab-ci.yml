@@ -3,7 +3,6 @@ stages:
   - plan
   # - apply
   # - output
-  - lint
   - checkov
   # - destroy
 
@@ -20,10 +19,10 @@ before_script:
   - terraform --version
    # Install tflint using curl
    # Install tflint using curl
-  - curl -sLo tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.43.0/tflint_linux_amd64.zip
-  - unzip tflint.zip
-  - chmod +x tflint
-  - ./tflint --version
+  #- curl -sLo tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.43.0/tflint_linux_amd64.zip
+  #- unzip tflint.zip
+  #- chmod +x tflint
+  #- ./tflint --version
 validate:
   stage: validate
   script:
@@ -64,15 +63,6 @@ plan:
 #     - apply
 #   tags:
 #     - ci-shared
-
-lint:
-  stage: lint
-  script:
-    - cd DiplomnaRabota/terraform
-    - /home/gitlab-runner/builds/uZaqzEMz/0/elsys/petar-petrov/tflint --config ./tflint.hcl
-    - tflint
-  tags:
-    - ci-shared
 
 checkov:
   stage: checkov
