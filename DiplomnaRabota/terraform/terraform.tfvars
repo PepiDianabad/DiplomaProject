@@ -1,3 +1,8 @@
 region = "eu-central-1"
 cluster_name = "interview-prep-eks-cluster"
 cluster_version = "1.31"
+db_host    = "postgres"
+db_port    = "5432"
+db_name    = "interview_prep_db"
+db_user    = "postgres"
+db_password = "password"
