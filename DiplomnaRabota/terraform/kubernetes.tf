@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "backend" {
           }
           env {
             name  = "DB_HOST"
-            value =  var.db_host #"postgres"  # postgresql service name
+            value =  var.db_user #"postgres"  # postgresql service name
           }
           env {
             name  = "DB_PORT"
