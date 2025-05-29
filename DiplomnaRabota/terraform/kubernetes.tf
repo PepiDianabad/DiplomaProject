@@ -49,23 +49,32 @@ resource "kubernetes_deployment" "backend" {
           }
           env {
             name  = "DB_HOST"
-            value =  var.db_host #"postgres"  # postgresql service name
+            value = "postgres"  # postgresql service name
           }
           env {
             name  = "DB_PORT"
-            value = var.db_port #"5432"
+            value = "5432"
           }
           env {
             name  = "DB_NAME"
-            value = var.db_host #"postgres"
+            value = "postgres"
           }
           env {
             name  = "DB_USER"
-            value = var.db_user #"postgres"
+            value = "postgres"
           }
           env {
             name  = "DB_PASSWORD"
-            value = var.db_password #"password"
+            value = "password"
+          }
+          env {
+            name = "OPENAI_API_KEY"
+            value_from {
+              secret_key_ref {
+                name = "openai-api-key"
+                key  = "OPENAI_API_KEY"    
+              }          
+            }
           }
         }
       }
@@ -174,15 +183,15 @@ resource "kubernetes_deployment" "database" {
           }
           env {
             name  = "POSTGRES_USER"
-            value = var.db_user #"postgres"
+            value = "postgres"
           }
           env {
             name  = "POSTGRES_PASSWORD"
-            value = var.db_password #"password"
+            value = "password"
           }
           env {
             name  = "POSTGRES_DB"
-            value = var.db_name #"interview_prep_db"  # set the desired database name here
+            value = "interview_prep_db"  # set the desired database name here
           }
         }
       }

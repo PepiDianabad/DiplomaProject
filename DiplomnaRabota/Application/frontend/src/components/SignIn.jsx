@@ -22,11 +22,10 @@ const SignIn = ({ setUser }) => {
         });
 
         const userId = response.data.userId; //get the user id from the backend auth
-        // Handle successful login, e.g., set user and navigate
         setUser({ username });
         console.log(response.data);
         // after successful login
-        navigate('/', { state: { userId } }); // Navigate to the home page after successful login and pass the user id
+        navigate('/', { state: { userId } }); 
       } catch (err) {
         setError('Invalid username or password');
       }
