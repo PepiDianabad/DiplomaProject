@@ -61,7 +61,7 @@ def load_metrics_from_s3(bucket_name, object_key):
 def preprocess_metrics(data):
     """Preprocess metrics data for forecasting."""
     try:
-        data['start'] = pd.to_datetime(data['start'], errors='coerce')  # Convert 'start' column to datetime
+        data['start'] = pd.to_datetime(data['start'], errors='coerce')  
         data['target_value'] = data['target'].apply(lambda x: x[0] if isinstance(x, list) else None)
         data = data[['start', 'target_value']].dropna()  # Drop rows with NaN target_value
         data.set_index('start', inplace=True)
@@ -100,7 +100,6 @@ def send_sns_notification(node_exceedances):
 def predict():
     """Perform prediction using metrics data."""
     try:
-        # Load and preprocess metrics data from S3
         metrics_data = load_metrics_from_s3(metrics_bucket, metrics_key)
         preprocessed_data = preprocess_metrics(metrics_data)
 
