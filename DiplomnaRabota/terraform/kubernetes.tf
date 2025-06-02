@@ -191,7 +191,7 @@ resource "kubernetes_deployment" "database" {
           }
           env {
             name  = "POSTGRES_DB"
-            value = "interview_prep_db"  # set the desired database name here
+            value = "interview_prep_db" 
           }
         }
       }
