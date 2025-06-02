@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const User = require('./UserModel'); // Importing User Model
+const User = require('./UserModel');
 
 
 class Interview extends Model {}
@@ -31,10 +31,10 @@ Interview.init({
   modelName: 'Interview',
 });
 
-// Define the relation back to User - UserId in the Interview table refers to the ID in the User table
+// relation back to User - UserId in the Interview table refers to the ID in the User table
 Interview.belongsTo(User, {
   foreignKey: 'userId', // This should match the userId in the User model
-  onDelete: 'CASCADE', // Specify whether you want rows deleted in a child table when corresponding rows are deleted in the parent table
+  onDelete: 'CASCADE',
 });
 
 module.exports = Interview;
