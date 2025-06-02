@@ -7,8 +7,8 @@ region = "eu-central-1"
 endpoint_name = "ppetrov-endpoint"
 runtime_client = boto3.client("sagemaker-runtime", region_name=region)
 
-# Define input data (empty placeholder)
-input_data = {"placeholder": True}  # or use {} if acceptable
+
+input_data = {"placeholder": True} 
 
 # call the endpoint
 response = runtime_client.invoke_endpoint(
@@ -35,7 +35,7 @@ node_1 = predictions[0::3]
 node_2 = predictions[1::3]  
 node_3 = predictions[2::3]  
 
-# Ensure all lists have the same length
+
 min_length = min(len(node_1), len(node_2), len(node_3))
 node_1 = node_1[:min_length]
 node_2 = node_2[:min_length]
@@ -68,7 +68,6 @@ plt.legend()
 plt.grid(True)
 plt.show(block=False)
 
-# Ensure each plot is in a separate figure
 plt.figure()
 plt.plot(node_1, marker='o', linestyle='-', color='b', label='Node 1')
 plt.title("Node 1 Predictions")
